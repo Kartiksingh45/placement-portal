@@ -1,6 +1,6 @@
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import type { LucideIcon } from 'lucide-react'
-import { Briefcase, LogOut } from 'lucide-react'
+import { Briefcase, LogOut, Menu, X } from 'lucide-react'
 import clsx from 'clsx'
 import { useAuth } from '../contexts/auth-context'
 
@@ -25,28 +25,71 @@ export function PortalShell({
   children: ReactNode
 }) {
   const { profile, signOut } = useAuth()
+  const [mobileOpen, setMobileOpen] = useState(false)
+
+  function selectAndClose(id: string) {
+    onSelect(id)
+    setMobileOpen(false)
+  }
 
   return (
     <div className="min-h-screen bg-slate-900 text-white flex">
-      <aside className="w-64 shrink-0 bg-slate-800 border-r border-slate-700 flex flex-col">
-        <div className="flex items-center gap-2 px-5 py-5 border-b border-slate-700">
-          <div className="p-2 bg-blue-600/20 text-blue-400 rounded-lg">
-            <Briefcase className="w-5 h-5" />
+      <div className="sm:hidden fixed top-0 inset-x-0 z-30 flex items-center justify-between px-4 py-3 bg-slate-800 border-b border-slate-700">
+        <div className="flex items-center gap-2">
+          <div className="p-1.5 bg-blue-600/20 text-blue-400 rounded-lg">
+            <Briefcase className="w-4 h-4" />
           </div>
-          <div>
-            <p className="text-sm font-semibold leading-tight">Placement Portal</p>
-            <p className="text-xs text-slate-400 leading-tight">{roleLabel}</p>
+          <p className="text-sm font-semibold">Placement Portal</p>
+        </div>
+        <button
+          onClick={() => setMobileOpen(true)}
+          className="p-2 text-slate-300 hover:text-white cursor-pointer"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
+      </div>
+
+      {mobileOpen && (
+        <div
+          className="sm:hidden fixed inset-0 bg-black/50 z-40"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      <aside
+        className={clsx(
+          'w-64 shrink-0 bg-slate-800 border-r border-slate-700 flex flex-col',
+          'fixed inset-y-0 left-0 z-50 transition-transform duration-200',
+          'sm:static sm:translate-x-0',
+          mobileOpen ? 'translate-x-0' : '-translate-x-full',
+        )}
+      >
+        <div className="flex items-center justify-between gap-2 px-5 py-5 border-b border-slate-700">
+          <div className="flex items-center gap-2">
+            <div className="p-2 bg-blue-600/20 text-blue-400 rounded-lg">
+              <Briefcase className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold leading-tight">Placement Portal</p>
+              <p className="text-xs text-slate-400 leading-tight">{roleLabel}</p>
+            </div>
           </div>
+          <button
+            onClick={() => setMobileOpen(false)}
+            className="sm:hidden p-1 text-slate-400 hover:text-white cursor-pointer"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
-        <nav className="flex-1 px-3 py-4 space-y-1">
+        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
           {navItems.map((item) => {
             const Icon = item.icon
             const active = item.id === activeId
             return (
               <button
                 key={item.id}
-                onClick={() => onSelect(item.id)}
+                onClick={() => selectAndClose(item.id)}
                 className={clsx(
                   'w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer',
                   active
@@ -81,7 +124,7 @@ export function PortalShell({
         </div>
       </aside>
 
-      <main className="flex-1 p-8 overflow-y-auto">{children}</main>
+      <main className="flex-1 p-4 pt-20 sm:p-8 overflow-y-auto overflow-x-hidden">{children}</main>
     </div>
   )
 }
