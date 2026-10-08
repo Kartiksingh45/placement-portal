@@ -84,8 +84,13 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-2">
           <Link to="/" className="flex items-center gap-2 min-w-0 shrink-0">
             <Logo className="w-7 h-7 sm:w-8 sm:h-8 shrink-0" />
-            <span className="font-bold tracking-tight text-sm sm:text-base whitespace-nowrap">
-              UPATH
+            <span className="leading-tight">
+              <span className="block font-bold tracking-tight text-sm sm:text-base whitespace-nowrap">
+                UPATH
+              </span>
+              <span className="hidden lg:block text-[10px] text-slate-400 whitespace-nowrap">
+                University Placement And Transition Hub
+              </span>
             </span>
           </Link>
           <nav className="hidden md:flex items-center gap-8 text-sm text-slate-300">

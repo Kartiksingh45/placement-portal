@@ -21,6 +21,7 @@ export default function Login() {
           <Logo className="w-14 h-14" />
           <h1 className="text-xl font-bold tracking-tight">Sign in</h1>
           <p className="text-sm text-slate-400">UPATH</p>
+          <p className="text-xs text-slate-500">University Placement And Transition Hub</p>
         </div>
 
         <SignInForm />

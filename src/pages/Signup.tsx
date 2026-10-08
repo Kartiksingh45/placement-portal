@@ -68,6 +68,7 @@ export default function Signup() {
           <Logo className="w-14 h-14" />
           <h1 className="text-xl font-bold tracking-tight">Create student account</h1>
           <p className="text-sm text-slate-400">UPATH</p>
+          <p className="text-xs text-slate-500">University Placement And Transition Hub</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">

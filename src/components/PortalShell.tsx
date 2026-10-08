@@ -70,10 +70,13 @@ export function PortalShell({
       >
         <div className="flex items-center justify-between gap-2 px-5 py-5 border-b border-slate-700">
           <Link to="/" className="flex items-center gap-2">
-            <Logo className="w-9 h-9" />
+            <Logo className="w-9 h-9 shrink-0" />
             <div>
               <p className="text-sm font-semibold leading-tight">UPATH</p>
-              <p className="text-xs text-slate-400 leading-tight">{roleLabel}</p>
+              <p className="text-[10px] text-slate-500 leading-tight">
+                University Placement And Transition Hub
+              </p>
+              <p className="text-xs text-slate-400 leading-tight mt-0.5">{roleLabel}</p>
             </div>
           </Link>
           <div className="flex items-center gap-1">
@@ -134,8 +137,13 @@ export function PortalShell({
       <main className="flex-1 p-4 pt-20 sm:p-8 overflow-y-auto overflow-x-hidden">
         <div className="pb-6 mb-6 border-b border-slate-800">
           <Link to="/" className="inline-flex items-center gap-3">
-            <Logo className="w-9 h-9" />
-            <span className="text-lg font-bold tracking-tight">UPATH</span>
+            <Logo className="w-9 h-9 shrink-0" />
+            <span>
+              <span className="block text-lg font-bold tracking-tight leading-tight">UPATH</span>
+              <span className="block text-xs text-slate-500 leading-tight">
+                University Placement And Transition Hub
+              </span>
+            </span>
           </Link>
         </div>
         {children}
