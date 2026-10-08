@@ -12,7 +12,7 @@ const corsHeaders = {
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
 const GROQ_API_KEY = Deno.env.get("GROQ_API_KEY");
-const GROQ_MODEL = "llama-3.3-70b-versatile";
+const GROQ_MODEL = "openai/gpt-oss-120b";
 const MAX_QUESTIONS = 5;
 
 const PERSONA =
