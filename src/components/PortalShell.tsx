@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from 'react'
 import type { LucideIcon } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { LogOut, Menu, X } from 'lucide-react'
 import clsx from 'clsx'
 import { useAuth } from '../contexts/auth-context'
@@ -37,13 +38,10 @@ export function PortalShell({
   return (
     <div className="min-h-screen bg-slate-900 text-white flex">
       <div className="sm:hidden fixed top-0 inset-x-0 z-30 flex items-center justify-between px-4 py-3 bg-slate-800 border-b border-slate-700">
-        <button
-          onClick={() => selectAndClose('overview')}
-          className="flex items-center gap-2 cursor-pointer"
-        >
+        <Link to="/" className="flex items-center gap-2">
           <Logo className="w-7 h-7" />
           <p className="text-sm font-semibold">UPATH</p>
-        </button>
+        </Link>
         <div className="flex items-center gap-1">
           <ThemeToggle />
           <button
@@ -71,16 +69,13 @@ export function PortalShell({
         )}
       >
         <div className="flex items-center justify-between gap-2 px-5 py-5 border-b border-slate-700">
-          <button
-            onClick={() => selectAndClose('overview')}
-            className="flex items-center gap-2 cursor-pointer text-left"
-          >
+          <Link to="/" className="flex items-center gap-2">
             <Logo className="w-9 h-9" />
             <div>
               <p className="text-sm font-semibold leading-tight">UPATH</p>
               <p className="text-xs text-slate-400 leading-tight">{roleLabel}</p>
             </div>
-          </button>
+          </Link>
           <div className="flex items-center gap-1">
             <div className="hidden sm:block">
               <ThemeToggle />
@@ -137,9 +132,11 @@ export function PortalShell({
       </aside>
 
       <main className="flex-1 p-4 pt-20 sm:p-8 overflow-y-auto overflow-x-hidden">
-        <div className="flex items-center gap-3 pb-6 mb-6 border-b border-slate-800">
-          <Logo className="w-9 h-9" />
-          <span className="text-lg font-bold tracking-tight">UPATH</span>
+        <div className="pb-6 mb-6 border-b border-slate-800">
+          <Link to="/" className="inline-flex items-center gap-3">
+            <Logo className="w-9 h-9" />
+            <span className="text-lg font-bold tracking-tight">UPATH</span>
+          </Link>
         </div>
         {children}
       </main>
