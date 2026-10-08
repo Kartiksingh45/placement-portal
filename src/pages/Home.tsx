@@ -1,4 +1,4 @@
-import { Link, Navigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import type { LucideIcon } from 'lucide-react'
 import {
   ArrowRight,
@@ -75,11 +75,8 @@ function HeroIllustration() {
 }
 
 export default function Home() {
-  const { user, profile, loading } = useAuth()
-
-  if (!loading && user) {
-    return <Navigate to={profile?.role === 'tpo' ? '/tpo' : '/student'} replace />
-  }
+  const { user, profile } = useAuth()
+  const dashboardPath = profile?.role === 'tpo' ? '/tpo' : '/student'
 
   return (
     <div className="min-h-screen bg-slate-900 text-white">
@@ -104,18 +101,29 @@ export default function Home() {
           </nav>
           <div className="flex items-center gap-1 sm:gap-3 shrink-0">
             <ThemeToggle />
-            <Link
-              to="/login"
-              className="text-xs sm:text-sm font-medium text-slate-300 hover:text-white transition-colors px-1.5 sm:px-2 whitespace-nowrap"
-            >
-              Log in
-            </Link>
-            <Link
-              to="/signup"
-              className="text-xs sm:text-sm font-medium bg-blue-600 hover:bg-blue-500 px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-lg transition-colors whitespace-nowrap"
-            >
-              Sign up
-            </Link>
+            {user ? (
+              <Link
+                to={dashboardPath}
+                className="text-xs sm:text-sm font-medium bg-blue-600 hover:bg-blue-500 px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-lg transition-colors whitespace-nowrap"
+              >
+                Go to Dashboard
+              </Link>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className="text-xs sm:text-sm font-medium text-slate-300 hover:text-white transition-colors px-1.5 sm:px-2 whitespace-nowrap"
+                >
+                  Log in
+                </Link>
+                <Link
+                  to="/signup"
+                  className="text-xs sm:text-sm font-medium bg-blue-600 hover:bg-blue-500 px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-lg transition-colors whitespace-nowrap"
+                >
+                  Sign up
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -139,16 +147,28 @@ export default function Home() {
               interviews with company HRs — all in one dashboard.
             </p>
             <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-              <Link
-                to="/signup"
-                className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 font-medium px-6 py-3 rounded-lg transition-colors"
-              >
-                Get started
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link to="/login" className="text-sm font-medium text-slate-300 hover:text-white">
-                Already have an account? Sign in →
-              </Link>
+              {user ? (
+                <Link
+                  to={dashboardPath}
+                  className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 font-medium px-6 py-3 rounded-lg transition-colors"
+                >
+                  Go to Dashboard
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    to="/signup"
+                    className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 font-medium px-6 py-3 rounded-lg transition-colors"
+                  >
+                    Get started
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                  <Link to="/login" className="text-sm font-medium text-slate-300 hover:text-white">
+                    Already have an account? Sign in →
+                  </Link>
+                </>
+              )}
             </div>
           </div>
 
@@ -241,15 +261,31 @@ export default function Home() {
       </section>
 
       <section className="border-t border-slate-800 py-16 text-center">
-        <h2 className="text-2xl sm:text-3xl font-bold mb-3">Ready to get started?</h2>
-        <p className="text-slate-400 mb-6">Create an account in under a minute.</p>
-        <Link
-          to="/signup"
-          className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 font-medium px-6 py-3 rounded-lg transition-colors"
-        >
-          Sign up now
-          <ArrowRight className="w-4 h-4" />
-        </Link>
+        {user ? (
+          <>
+            <h2 className="text-2xl sm:text-3xl font-bold mb-3">Welcome back!</h2>
+            <p className="text-slate-400 mb-6">Jump back into your dashboard.</p>
+            <Link
+              to={dashboardPath}
+              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 font-medium px-6 py-3 rounded-lg transition-colors"
+            >
+              Go to Dashboard
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </>
+        ) : (
+          <>
+            <h2 className="text-2xl sm:text-3xl font-bold mb-3">Ready to get started?</h2>
+            <p className="text-slate-400 mb-6">Create an account in under a minute.</p>
+            <Link
+              to="/signup"
+              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 font-medium px-6 py-3 rounded-lg transition-colors"
+            >
+              Sign up now
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </>
+        )}
       </section>
 
       <footer className="border-t border-slate-800 py-8 text-center text-xs text-slate-500">
