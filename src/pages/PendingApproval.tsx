@@ -1,5 +1,6 @@
 import { Clock, XCircle } from 'lucide-react'
 import { useAuth } from '../contexts/auth-context'
+import { ThemeToggle } from '../components/ThemeToggle'
 import type { ProfileStatus } from '../types/database'
 
 export default function PendingApproval({ status }: { status: ProfileStatus }) {
@@ -8,6 +9,7 @@ export default function PendingApproval({ status }: { status: ProfileStatus }) {
 
   return (
     <div className="min-h-screen bg-slate-900 text-white flex flex-col items-center justify-center p-6">
+      <ThemeToggle className="fixed top-4 right-4 z-10" />
       <div className="max-w-md w-full bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-xl text-center space-y-4">
         <div
           className={`mx-auto w-fit p-3 rounded-full ${

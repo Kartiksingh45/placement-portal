@@ -4,6 +4,7 @@ import {
   Building2,
   LayoutGrid,
   ListChecks,
+  Megaphone,
   ShieldCheck,
   Table,
   UserCog,
@@ -20,6 +21,7 @@ import ArrangeStudentsSection from './ArrangeStudentsSection'
 import StudentRecordsSection from './StudentRecordsSection'
 import MeetingsSection from './MeetingsSection'
 import OfficersSection from './OfficersSection'
+import JobOpportunitiesSection from './JobOpportunitiesSection'
 import AnnouncementComposer from './AnnouncementComposer'
 import { countActiveDrives, countAllApplications, countStudents } from '../../lib/stats'
 import { fetchAllStudents } from '../../lib/students'
@@ -62,6 +64,7 @@ export default function TpoDashboard() {
     { id: 'arrange', label: 'Arrange Students', icon: ArrowDownWideNarrow },
     { id: 'meetings', label: 'Meetings', icon: Video },
     { id: 'officers', label: 'Placement Officers', icon: UserCog },
+    { id: 'jobs', label: 'Job Opportunities', icon: Megaphone },
   ]
 
   return (
@@ -107,6 +110,7 @@ export default function TpoDashboard() {
       {active === 'arrange' && <ArrangeStudentsSection />}
       {active === 'meetings' && <MeetingsSection />}
       {active === 'officers' && <OfficersSection />}
+      {active === 'jobs' && <JobOpportunitiesSection />}
     </PortalShell>
   )
 }

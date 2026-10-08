@@ -74,6 +74,8 @@ export default function ResumeSection() {
               resume_url: path,
               resume_parsed: null,
               resume_status: 'processing',
+              builder_resume: null,
+              resume_check: null,
               updated_at: new Date().toISOString(),
             },
       )

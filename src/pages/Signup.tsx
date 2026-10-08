@@ -3,6 +3,7 @@ import { Link, Navigate } from 'react-router-dom'
 import { Briefcase, UserPlus } from 'lucide-react'
 import { useAuth } from '../contexts/auth-context'
 import { BRANCH_OPTIONS, YEAR_OPTIONS } from '../types/database'
+import { ThemeToggle } from '../components/ThemeToggle'
 
 export default function Signup() {
   const { user, profile, signUp } = useAuth()
@@ -42,6 +43,7 @@ export default function Signup() {
   if (submitted) {
     return (
       <div className="min-h-screen bg-slate-900 text-white flex flex-col items-center justify-center p-6">
+        <ThemeToggle className="fixed top-4 right-4 z-10" />
         <div className="max-w-md w-full bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-xl text-center space-y-3">
           <h1 className="text-xl font-bold tracking-tight">Check your email</h1>
           <p className="text-sm text-slate-400">
@@ -59,6 +61,7 @@ export default function Signup() {
 
   return (
     <div className="min-h-screen bg-slate-900 text-white flex flex-col items-center justify-center p-6">
+      <ThemeToggle className="fixed top-4 right-4 z-10" />
       <div className="max-w-md w-full bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-xl space-y-5">
         <div className="flex flex-col items-center text-center space-y-2">
           <div className="p-3 bg-blue-600/20 text-blue-400 rounded-full">

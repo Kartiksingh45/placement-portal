@@ -3,6 +3,7 @@ import type { LucideIcon } from 'lucide-react'
 import { Briefcase, LogOut, Menu, X } from 'lucide-react'
 import clsx from 'clsx'
 import { useAuth } from '../contexts/auth-context'
+import { ThemeToggle } from './ThemeToggle'
 
 export interface NavItem {
   id: string
@@ -41,12 +42,15 @@ export function PortalShell({
           </div>
           <p className="text-sm font-semibold">Placement Portal</p>
         </div>
-        <button
-          onClick={() => setMobileOpen(true)}
-          className="p-2 text-slate-300 hover:text-white cursor-pointer"
-        >
-          <Menu className="w-5 h-5" />
-        </button>
+        <div className="flex items-center gap-1">
+          <ThemeToggle />
+          <button
+            onClick={() => setMobileOpen(true)}
+            className="p-2 text-slate-300 hover:text-white cursor-pointer"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+        </div>
       </div>
 
       {mobileOpen && (
@@ -74,12 +78,17 @@ export function PortalShell({
               <p className="text-xs text-slate-400 leading-tight">{roleLabel}</p>
             </div>
           </div>
-          <button
-            onClick={() => setMobileOpen(false)}
-            className="sm:hidden p-1 text-slate-400 hover:text-white cursor-pointer"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-1">
+            <div className="hidden sm:block">
+              <ThemeToggle />
+            </div>
+            <button
+              onClick={() => setMobileOpen(false)}
+              className="sm:hidden p-1 text-slate-400 hover:text-white cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">

@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { Briefcase, Send } from 'lucide-react'
 import { useAuth } from '../contexts/auth-context'
+import { ThemeToggle } from '../components/ThemeToggle'
 
 export default function ForgotPassword() {
   const { requestPasswordReset } = useAuth()
@@ -22,6 +23,7 @@ export default function ForgotPassword() {
 
   return (
     <div className="min-h-screen bg-slate-900 text-white flex flex-col items-center justify-center p-6">
+      <ThemeToggle className="fixed top-4 right-4 z-10" />
       <div className="max-w-md w-full bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-xl space-y-5">
         <div className="flex flex-col items-center text-center space-y-2">
           <div className="p-3 bg-blue-600/20 text-blue-400 rounded-full">

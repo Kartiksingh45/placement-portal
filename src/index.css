@@ -4,7 +4,88 @@
   color-scheme: dark;
 }
 
+body {
+  font-family:
+    'Inter',
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/*
+ * Light theme: re-maps the same slate/white tokens every page already uses
+ * (bg-slate-900, text-slate-400, text-white, etc.) so switching themes needs
+ * no per-page changes. Tailwind v4 compiles each utility as var(--color-*),
+ * so overriding the variables here re-themes the whole app at once.
+ */
+:root[data-theme='light'] {
+  color-scheme: light;
+  --color-white: oklch(18% 0.02 257);
+  --color-slate-100: oklch(15% 0.007 247.896);
+  --color-slate-200: oklch(22% 0.013 255.508);
+  --color-slate-300: oklch(32% 0.022 252.894);
+  --color-slate-400: oklch(45% 0.04 256.788);
+  --color-slate-500: oklch(52% 0.046 257.417);
+  --color-slate-600: oklch(83% 0.02 257);
+  --color-slate-700: oklch(90% 0.012 252);
+  --color-slate-800: oklch(99% 0.002 247.858);
+  --color-slate-900: oklch(97% 0.004 247.858);
+}
+
+/* The resume preview is meant to look like printed paper, always light,
+   regardless of the site theme — pin its tokens back to fixed values. */
+#resume-preview {
+  --color-white: #ffffff;
+  --color-slate-300: #cbd5e1;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-900: #0f172a;
+}
+
 select option {
-  background-color: #1e293b;
-  color: #f1f5f9;
+  background-color: var(--color-slate-800);
+  color: var(--color-white);
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(10px, -20px);
+  }
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #resume-preview,
+  #resume-preview * {
+    visibility: visible;
+  }
+  #resume-preview {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
-import { FileText, LayoutGrid, ListChecks, Mic, User, Video } from 'lucide-react'
+import { FileEdit, FileText, LayoutGrid, ListChecks, Mic, ScanSearch, User, Video } from 'lucide-react'
 import { PortalShell, type NavItem } from '../../components/PortalShell'
 import { useAuth } from '../../contexts/auth-context'
 import ResumeSection from './ResumeSection'
+import ResumeBuilder from './ResumeBuilder'
+import ResumeChecker from './ResumeChecker'
 import DrivesSection from './DrivesSection'
 import InterviewSection from './InterviewSection'
 import MeetingsSection from './MeetingsSection'
@@ -23,6 +25,8 @@ const NAV_ITEMS: NavItem[] = [
   { id: 'overview', label: 'Overview', icon: LayoutGrid },
   { id: 'profile', label: 'Profile', icon: User },
   { id: 'resume', label: 'Resume', icon: FileText },
+  { id: 'resume-builder', label: 'Resume Builder', icon: FileEdit },
+  { id: 'resume-checker', label: 'Resume Checker', icon: ScanSearch },
   { id: 'drives', label: 'Drives', icon: ListChecks },
   { id: 'interviews', label: 'Mock Interviews', icon: Mic },
   { id: 'meetings', label: 'Meetings', icon: Video },
@@ -106,6 +110,8 @@ export default function StudentDashboard() {
       )}
 
       {active === 'resume' && <ResumeSection />}
+      {active === 'resume-builder' && <ResumeBuilder />}
+      {active === 'resume-checker' && <ResumeChecker />}
       {active === 'drives' && <DrivesSection />}
       {active === 'interviews' && <InterviewSection />}
       {active === 'meetings' && <MeetingsSection />}

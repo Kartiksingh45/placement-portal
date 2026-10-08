@@ -58,6 +58,36 @@ export interface ParsedResume {
   summary?: string
 }
 
+export interface BuilderResumeEducation {
+  institution: string
+  degree: string
+  year: string
+}
+
+export interface BuilderResumeExperience {
+  title: string
+  company: string
+  duration: string
+  description: string
+}
+
+export interface BuilderResume {
+  full_name: string
+  email: string
+  phone: string
+  summary: string
+  education: BuilderResumeEducation[]
+  experience: BuilderResumeExperience[]
+  skills: string[]
+  certifications: string[]
+}
+
+export interface ResumeCheckResult {
+  score: number
+  strengths: string[]
+  suggestions: string[]
+}
+
 export interface StudentProfile {
   user_id: string
   branch: string | null
@@ -72,7 +102,19 @@ export interface StudentProfile {
   resume_url: string | null
   resume_parsed: ParsedResume | null
   resume_status: 'not_uploaded' | 'processing' | 'parsed' | 'failed'
+  builder_resume: BuilderResume | null
+  resume_check: ResumeCheckResult | null
   updated_at: string
+}
+
+export interface JobOpportunity {
+  id: string
+  company_name: string
+  role_title: string
+  description: string
+  photo_url: string | null
+  created_by: string | null
+  created_at: string
 }
 
 export interface Meeting {
