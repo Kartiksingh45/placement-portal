@@ -1,8 +1,9 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Briefcase, KeyRound } from 'lucide-react'
+import { KeyRound } from 'lucide-react'
 import { useAuth } from '../contexts/auth-context'
 import { ThemeToggle } from '../components/ThemeToggle'
+import { Logo } from '../components/Logo'
 
 export default function ResetPassword() {
   const { updatePassword } = useAuth()
@@ -38,9 +39,7 @@ export default function ResetPassword() {
       <ThemeToggle className="fixed top-4 right-4 z-10" />
       <div className="max-w-md w-full bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-xl space-y-5">
         <div className="flex flex-col items-center text-center space-y-2">
-          <div className="p-3 bg-blue-600/20 text-blue-400 rounded-full">
-            <Briefcase className="w-8 h-8" />
-          </div>
+          <Logo className="w-14 h-14" />
           <h1 className="text-xl font-bold tracking-tight">Set a new password</h1>
           <p className="text-sm text-slate-400">
             Follow the link in your email to get here, then choose a new password.

@@ -1,9 +1,10 @@
 import { useState, type FormEvent } from 'react'
 import { Link, Navigate } from 'react-router-dom'
-import { Briefcase, UserPlus } from 'lucide-react'
+import { UserPlus } from 'lucide-react'
 import { useAuth } from '../contexts/auth-context'
 import { BRANCH_OPTIONS, YEAR_OPTIONS } from '../types/database'
 import { ThemeToggle } from '../components/ThemeToggle'
+import { Logo } from '../components/Logo'
 
 export default function Signup() {
   const { user, profile, signUp } = useAuth()
@@ -64,11 +65,9 @@ export default function Signup() {
       <ThemeToggle className="fixed top-4 right-4 z-10" />
       <div className="max-w-md w-full bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-xl space-y-5">
         <div className="flex flex-col items-center text-center space-y-2">
-          <div className="p-3 bg-blue-600/20 text-blue-400 rounded-full">
-            <Briefcase className="w-8 h-8" />
-          </div>
+          <Logo className="w-14 h-14" />
           <h1 className="text-xl font-bold tracking-tight">Create student account</h1>
-          <p className="text-sm text-slate-400">Campus Placement Portal</p>
+          <p className="text-sm text-slate-400">UPATH</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">

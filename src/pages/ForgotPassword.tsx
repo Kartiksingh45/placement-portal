@@ -1,8 +1,9 @@
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { Briefcase, Send } from 'lucide-react'
+import { Send } from 'lucide-react'
 import { useAuth } from '../contexts/auth-context'
 import { ThemeToggle } from '../components/ThemeToggle'
+import { Logo } from '../components/Logo'
 
 export default function ForgotPassword() {
   const { requestPasswordReset } = useAuth()
@@ -26,9 +27,7 @@ export default function ForgotPassword() {
       <ThemeToggle className="fixed top-4 right-4 z-10" />
       <div className="max-w-md w-full bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-xl space-y-5">
         <div className="flex flex-col items-center text-center space-y-2">
-          <div className="p-3 bg-blue-600/20 text-blue-400 rounded-full">
-            <Briefcase className="w-8 h-8" />
-          </div>
+          <Logo className="w-14 h-14" />
           <h1 className="text-xl font-bold tracking-tight">Reset your password</h1>
           <p className="text-sm text-slate-400">
             Enter your account email and we&apos;ll send you a reset link.

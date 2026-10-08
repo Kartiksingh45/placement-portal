@@ -18,6 +18,7 @@ import {
 import { useAuth } from '../contexts/auth-context'
 import { JobTicker } from '../components/JobTicker'
 import { ThemeToggle } from '../components/ThemeToggle'
+import { Logo } from '../components/Logo'
 
 function FeatureCard({
   icon: Icon,
@@ -85,11 +86,9 @@ export default function Home() {
       <header className="sticky top-0 z-20 bg-slate-900/80 backdrop-blur border-b border-slate-800">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-2">
           <Link to="/" className="flex items-center gap-2 min-w-0 shrink-0">
-            <div className="p-1.5 bg-blue-600/20 text-blue-400 rounded-lg shrink-0">
-              <Briefcase className="w-5 h-5" />
-            </div>
+            <Logo className="w-7 h-7 sm:w-8 sm:h-8 shrink-0" />
             <span className="font-bold tracking-tight text-sm sm:text-base whitespace-nowrap">
-              Campus Placement Portal
+              UPATH
             </span>
           </Link>
           <nav className="hidden md:flex items-center gap-8 text-sm text-slate-300">
@@ -254,7 +253,7 @@ export default function Home() {
       </section>
 
       <footer className="border-t border-slate-800 py-8 text-center text-xs text-slate-500">
-        © 2026 Campus Placement Portal
+        © 2026 UPATH — University Placement And Transition Hub
       </footer>
     </div>
   )

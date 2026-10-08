@@ -1,9 +1,10 @@
 import { useState, type ReactNode } from 'react'
 import type { LucideIcon } from 'lucide-react'
-import { Briefcase, LogOut, Menu, X } from 'lucide-react'
+import { LogOut, Menu, X } from 'lucide-react'
 import clsx from 'clsx'
 import { useAuth } from '../contexts/auth-context'
 import { ThemeToggle } from './ThemeToggle'
+import { Logo } from './Logo'
 
 export interface NavItem {
   id: string
@@ -40,10 +41,8 @@ export function PortalShell({
           onClick={() => selectAndClose('overview')}
           className="flex items-center gap-2 cursor-pointer"
         >
-          <div className="p-1.5 bg-blue-600/20 text-blue-400 rounded-lg">
-            <Briefcase className="w-4 h-4" />
-          </div>
-          <p className="text-sm font-semibold">Placement Portal</p>
+          <Logo className="w-7 h-7" />
+          <p className="text-sm font-semibold">UPATH</p>
         </button>
         <div className="flex items-center gap-1">
           <ThemeToggle />
@@ -76,11 +75,9 @@ export function PortalShell({
             onClick={() => selectAndClose('overview')}
             className="flex items-center gap-2 cursor-pointer text-left"
           >
-            <div className="p-2 bg-blue-600/20 text-blue-400 rounded-lg">
-              <Briefcase className="w-5 h-5" />
-            </div>
+            <Logo className="w-9 h-9" />
             <div>
-              <p className="text-sm font-semibold leading-tight">Placement Portal</p>
+              <p className="text-sm font-semibold leading-tight">UPATH</p>
               <p className="text-xs text-slate-400 leading-tight">{roleLabel}</p>
             </div>
           </button>
@@ -141,10 +138,8 @@ export function PortalShell({
 
       <main className="flex-1 p-4 pt-20 sm:p-8 overflow-y-auto overflow-x-hidden">
         <div className="flex items-center gap-3 pb-6 mb-6 border-b border-slate-800">
-          <div className="p-2 bg-blue-600/20 text-blue-400 rounded-lg shrink-0">
-            <Briefcase className="w-5 h-5" />
-          </div>
-          <span className="text-lg font-bold tracking-tight">Campus Placement Portal</span>
+          <Logo className="w-9 h-9" />
+          <span className="text-lg font-bold tracking-tight">UPATH</span>
         </div>
         {children}
       </main>
