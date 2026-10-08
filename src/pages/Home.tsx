@@ -46,12 +46,14 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-slate-900 text-white">
       <header className="sticky top-0 z-20 bg-slate-900/80 backdrop-blur border-b border-slate-800">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="p-1.5 bg-blue-600/20 text-blue-400 rounded-lg">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-2">
+          <Link to="/" className="flex items-center gap-2 min-w-0 shrink-0">
+            <div className="p-1.5 bg-blue-600/20 text-blue-400 rounded-lg shrink-0">
               <Briefcase className="w-5 h-5" />
             </div>
-            <span className="font-bold tracking-tight">Campus Placement Portal</span>
+            <span className="font-bold tracking-tight text-sm sm:text-base whitespace-nowrap">
+              Campus Placement Portal
+            </span>
           </Link>
           <nav className="hidden md:flex items-center gap-8 text-sm text-slate-300">
             <a href="#students" className="hover:text-white transition-colors">
@@ -64,17 +66,17 @@ export default function Home() {
               Opportunities
             </a>
           </nav>
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1 sm:gap-3 shrink-0">
             <ThemeToggle />
             <Link
               to="/login"
-              className="text-sm font-medium text-slate-300 hover:text-white transition-colors px-2"
+              className="text-xs sm:text-sm font-medium text-slate-300 hover:text-white transition-colors px-1.5 sm:px-2 whitespace-nowrap"
             >
               Log in
             </Link>
             <Link
               to="/signup"
-              className="text-sm font-medium bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg transition-colors"
+              className="text-xs sm:text-sm font-medium bg-blue-600 hover:bg-blue-500 px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-lg transition-colors whitespace-nowrap"
             >
               Sign up
             </Link>
