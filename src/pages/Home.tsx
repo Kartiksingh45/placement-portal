@@ -47,12 +47,12 @@ export default function Home() {
     <div className="min-h-screen bg-slate-900 text-white">
       <header className="sticky top-0 z-20 bg-slate-900/80 backdrop-blur border-b border-slate-800">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2">
             <div className="p-1.5 bg-blue-600/20 text-blue-400 rounded-lg">
               <Briefcase className="w-5 h-5" />
             </div>
             <span className="font-bold tracking-tight">Campus Placement Portal</span>
-          </div>
+          </Link>
           <nav className="hidden md:flex items-center gap-8 text-sm text-slate-300">
             <a href="#students" className="hover:text-white transition-colors">
               Students
