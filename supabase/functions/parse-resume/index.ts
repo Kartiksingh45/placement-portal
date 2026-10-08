@@ -1,8 +1,9 @@
 // Deno Edge Function. Deploy by pasting this file into the Supabase Dashboard
-// (Edge Functions -> parse-resume -> Code) and setting the GEMINI_API_KEY
-// secret (Edge Functions -> Secrets). Get a free key at aistudio.google.com/apikey
-// (no credit card required, generous free-tier quota).
+// (Edge Functions -> parse-resume -> Code) and setting the GROQ_API_KEY
+// secret (Edge Functions -> Secrets). Get a free key at console.groq.com
+// (no credit card required).
 import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2";
+import { extractText, getDocumentProxy } from "npm:unpdf@0.12.1";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -11,46 +12,21 @@ const corsHeaders = {
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
-const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-const GEMINI_MODEL = "gemini-3.8-flash";
+const GROQ_API_KEY = Deno.env.get("GROQ_API_KEY");
+const GROQ_MODEL = "llama-3.3-70b-versatile";
 
-// Gemini's structured-output schema uses uppercase type names (OpenAPI-subset), unlike JSON Schema.
-const RESUME_SCHEMA = {
-  type: "OBJECT",
-  properties: {
-    full_name: { type: "STRING" },
-    phone: { type: "STRING" },
-    branch: { type: "STRING", description: "Degree/branch of study, e.g. Computer Science" },
-    batch_year: { type: "INTEGER", description: "Expected or actual graduation year" },
-    cgpa: { type: "NUMBER" },
-    skills: { type: "ARRAY", items: { type: "STRING" } },
-    certifications: { type: "ARRAY", items: { type: "STRING" } },
-    education: {
-      type: "ARRAY",
-      items: {
-        type: "OBJECT",
-        properties: {
-          institution: { type: "STRING" },
-          degree: { type: "STRING" },
-          year: { type: "STRING" },
-        },
-      },
-    },
-    experience: {
-      type: "ARRAY",
-      items: {
-        type: "OBJECT",
-        properties: {
-          title: { type: "STRING" },
-          company: { type: "STRING" },
-          duration: { type: "STRING" },
-        },
-      },
-    },
-    summary: { type: "STRING" },
-  },
-  required: ["skills", "certifications"],
-};
+const RESUME_SHAPE = `{
+  "full_name": <string>,
+  "phone": <string>,
+  "branch": <string, degree/branch of study e.g. Computer Science>,
+  "batch_year": <integer, expected or actual graduation year>,
+  "cgpa": <number>,
+  "skills": [<string>, ...],
+  "certifications": [<string>, ...],
+  "education": [{"institution": <string>, "degree": <string>, "year": <string>}, ...],
+  "experience": [{"title": <string>, "company": <string>, "duration": <string>}, ...],
+  "summary": <string>
+}`;
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
@@ -84,9 +60,9 @@ Deno.serve(async (req: Request) => {
       resume_status: "processing",
     });
 
-    if (!GEMINI_API_KEY) {
+    if (!GROQ_API_KEY) {
       await markFailed(supabase, userId);
-      return jsonResponse({ error: "Server is missing GEMINI_API_KEY" }, 500);
+      return jsonResponse({ error: "Server is missing GROQ_API_KEY" }, 500);
     }
 
     const { data: fileBlob, error: downloadError } = await supabase.storage
@@ -98,48 +74,58 @@ Deno.serve(async (req: Request) => {
       return jsonResponse({ error: "Failed to download resume" }, 500);
     }
 
-    const base64 = encodeBase64(await fileBlob.arrayBuffer());
-
-    const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`,
-      {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          "x-goog-api-key": GEMINI_API_KEY,
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                { inlineData: { mimeType: "application/pdf", data: base64 } },
-                {
-                  text:
-                    "Extract this student's resume into the given JSON schema. Omit fields you cannot find rather than guessing.",
-                },
-              ],
-            },
-          ],
-          generationConfig: {
-            responseMimeType: "application/json",
-            responseSchema: RESUME_SCHEMA,
-          },
-        }),
-      },
-    );
-
-    if (!geminiRes.ok) {
+    let resumeText: string;
+    try {
+      const pdf = await getDocumentProxy(new Uint8Array(await fileBlob.arrayBuffer()));
+      const { text } = await extractText(pdf, { mergePages: true });
+      resumeText = text;
+    } catch {
       await markFailed(supabase, userId);
-      const errText = await geminiRes.text();
-      return jsonResponse({ error: `Gemini API error: ${errText}` }, 502);
+      return jsonResponse({ error: "Could not read text from this PDF" }, 422);
     }
 
-    const geminiJson = await geminiRes.json();
-    const text: string | undefined = geminiJson.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!resumeText || !resumeText.trim()) {
+      await markFailed(supabase, userId);
+      return jsonResponse({ error: "No extractable text found in this PDF" }, 422);
+    }
+
+    const groqRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${GROQ_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: GROQ_MODEL,
+        response_format: { type: "json_object" },
+        messages: [
+          {
+            role: "system",
+            content:
+              "Extract this student's resume into a single valid JSON object, no markdown, " +
+              "no commentary. Omit fields you cannot find rather than guessing. Match exactly " +
+              `this shape: ${RESUME_SHAPE}`,
+          },
+          {
+            role: "user",
+            content: `Resume text:\n\n${resumeText.slice(0, 15000)}`,
+          },
+        ],
+      }),
+    });
+
+    if (!groqRes.ok) {
+      await markFailed(supabase, userId);
+      const errText = await groqRes.text();
+      return jsonResponse({ error: `Groq API error: ${errText}` }, 502);
+    }
+
+    const groqJson = await groqRes.json();
+    const text: string | undefined = groqJson.choices?.[0]?.message?.content;
 
     if (!text) {
       await markFailed(supabase, userId);
-      return jsonResponse({ error: "Gemini did not return structured data" }, 502);
+      return jsonResponse({ error: "Groq did not return content" }, 502);
     }
 
     let parsed: Record<string, unknown>;
@@ -147,7 +133,7 @@ Deno.serve(async (req: Request) => {
       parsed = JSON.parse(text);
     } catch {
       await markFailed(supabase, userId);
-      return jsonResponse({ error: "Gemini returned invalid JSON" }, 502);
+      return jsonResponse({ error: "Groq returned invalid JSON" }, 502);
     }
 
     const { data: updated, error: updateError } = await supabase
@@ -189,14 +175,4 @@ function jsonResponse(body: unknown, status: number) {
     status,
     headers: { ...corsHeaders, "content-type": "application/json" },
   });
-}
-
-function encodeBase64(buffer: ArrayBuffer): string {
-  const bytes = new Uint8Array(buffer);
-  let binary = "";
-  const chunkSize = 0x8000;
-  for (let i = 0; i < bytes.length; i += chunkSize) {
-    binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
-  }
-  return btoa(binary);
 }

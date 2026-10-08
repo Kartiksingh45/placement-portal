@@ -1,6 +1,7 @@
 // Deno Edge Function. Deploy by pasting this file into the Supabase Dashboard
-// (Edge Functions -> Create function -> name it "mock-interview"). Reuses the
-// GEMINI_API_KEY secret already set up for parse-resume.
+// (Edge Functions -> Create function -> name it "mock-interview"). Requires a
+// GROQ_API_KEY secret (Edge Functions -> Secrets). Get a free key at
+// console.groq.com — no credit card required.
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -10,14 +11,15 @@ const corsHeaders = {
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
-const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-const GEMINI_MODEL = "gemini-3.8-flash";
+const GROQ_API_KEY = Deno.env.get("GROQ_API_KEY");
+const GROQ_MODEL = "llama-3.3-70b-versatile";
 const MAX_QUESTIONS = 5;
 
 const PERSONA =
   "You are a friendly but rigorous technical interviewer conducting a short mock placement " +
   "interview for a college student. Keep questions concise (1-3 sentences) and appropriate " +
-  "to the student's stated skills and experience level.";
+  "to the student's stated skills and experience level. Always respond with ONLY a single " +
+  "valid JSON object, no markdown, no commentary.";
 
 interface StudentProfileRow {
   branch: string | null;
@@ -32,37 +34,37 @@ interface InterviewTurnRow {
   answer: string | null;
 }
 
-async function callGemini(
+async function callGroq(
   systemInstruction: string,
   prompt: string,
-  schema: Record<string, unknown>,
+  shapeDescription: string,
 ): Promise<Record<string, unknown>> {
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`,
-    {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        "x-goog-api-key": GEMINI_API_KEY!,
-      },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: systemInstruction }] },
-        contents: [{ role: "user", parts: [{ text: prompt }] }],
-        generationConfig: {
-          responseMimeType: "application/json",
-          responseSchema: schema,
-        },
-      }),
+  const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      authorization: `Bearer ${GROQ_API_KEY}`,
     },
-  );
+    body: JSON.stringify({
+      model: GROQ_MODEL,
+      response_format: { type: "json_object" },
+      messages: [
+        {
+          role: "system",
+          content: `${systemInstruction} Respond matching exactly this JSON shape: ${shapeDescription}`,
+        },
+        { role: "user", content: prompt },
+      ],
+    }),
+  });
 
   if (!res.ok) {
-    throw new Error(`Gemini API error: ${await res.text()}`);
+    throw new Error(`Groq API error: ${await res.text()}`);
   }
 
   const json = await res.json();
-  const text: string | undefined = json.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!text) throw new Error("Gemini did not return structured data");
+  const text: string | undefined = json.choices?.[0]?.message?.content;
+  if (!text) throw new Error("Groq did not return content");
   return JSON.parse(text);
 }
 
@@ -95,8 +97,8 @@ Deno.serve(async (req: Request) => {
     }
     const userId = userData.user.id;
 
-    if (!GEMINI_API_KEY) {
-      return jsonResponse({ error: "Server is missing GEMINI_API_KEY" }, 500);
+    if (!GROQ_API_KEY) {
+      return jsonResponse({ error: "Server is missing GROQ_API_KEY" }, 500);
     }
 
     const body = await req.json();
@@ -116,14 +118,10 @@ Deno.serve(async (req: Request) => {
         .single();
       if (sessionError) return jsonResponse({ error: sessionError.message }, 500);
 
-      const result = await callGemini(
+      const result = await callGroq(
         PERSONA,
         `Candidate resume summary:\n${resumeContext(sp as StudentProfileRow)}\n\nAsk the first interview question.`,
-        {
-          type: "OBJECT",
-          properties: { question: { type: "STRING" } },
-          required: ["question"],
-        },
+        '{"question": <string>}',
       );
 
       const { data: turn, error: turnError } = await supabase
@@ -184,27 +182,11 @@ Deno.serve(async (req: Request) => {
           : " Then ask the next interview question (different topic or a deeper follow-up)."
       }`;
 
-      const schema = isLastTurn
-        ? {
-            type: "OBJECT",
-            properties: {
-              score: { type: "INTEGER", description: "Score from 0 to 100" },
-              feedback: { type: "STRING" },
-              overall_summary: { type: "STRING" },
-            },
-            required: ["score", "feedback", "overall_summary"],
-          }
-        : {
-            type: "OBJECT",
-            properties: {
-              score: { type: "INTEGER", description: "Score from 0 to 100" },
-              feedback: { type: "STRING" },
-              next_question: { type: "STRING" },
-            },
-            required: ["score", "feedback", "next_question"],
-          };
+      const shapeDescription = isLastTurn
+        ? '{"score": <integer 0-100>, "feedback": <string>, "overall_summary": <string>}'
+        : '{"score": <integer 0-100>, "feedback": <string>, "next_question": <string>}';
 
-      const result = await callGemini(PERSONA, prompt, schema);
+      const result = await callGroq(PERSONA, prompt, shapeDescription);
       const score = result.score as number;
       const feedback = result.feedback as string;
 

@@ -1,6 +1,7 @@
 // Deno Edge Function. Deploy by pasting this file into the Supabase Dashboard
 // (Edge Functions -> Create function -> name it "check-resume" -> paste this code).
-// Requires the same GEMINI_API_KEY secret used by parse-resume (Edge Functions -> Secrets).
+// Requires a GROQ_API_KEY secret (Edge Functions -> Secrets). Get a free key at
+// console.groq.com — no credit card required.
 //
 // Scores a student's resume data (either the parsed-from-upload version or the
 // Resume Builder's structured version) and returns an ATS-style score plus
@@ -14,22 +15,8 @@ const corsHeaders = {
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
-const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-const GEMINI_MODEL = "gemini-3.8-flash";
-
-const CHECK_SCHEMA = {
-  type: "OBJECT",
-  properties: {
-    score: { type: "INTEGER", description: "ATS compatibility score from 0 to 100" },
-    strengths: { type: "ARRAY", items: { type: "STRING" } },
-    suggestions: {
-      type: "ARRAY",
-      items: { type: "STRING" },
-      description: "Specific, actionable improvements",
-    },
-  },
-  required: ["score", "strengths", "suggestions"],
-};
+const GROQ_API_KEY = Deno.env.get("GROQ_API_KEY");
+const GROQ_MODEL = "llama-3.3-70b-versatile";
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
@@ -57,56 +44,54 @@ Deno.serve(async (req: Request) => {
       return jsonResponse({ error: "resume data is required" }, 400);
     }
 
-    if (!GEMINI_API_KEY) {
-      return jsonResponse({ error: "Server is missing GEMINI_API_KEY" }, 500);
+    if (!GROQ_API_KEY) {
+      return jsonResponse({ error: "Server is missing GROQ_API_KEY" }, 500);
     }
 
-    const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`,
-      {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          "x-goog-api-key": GEMINI_API_KEY,
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text:
-                    "Act as an ATS (applicant tracking system) resume reviewer for a campus " +
-                    "placement portal. Given this resume data as JSON, return a compatibility " +
-                    "score (0-100), a list of genuine strengths, and specific, actionable " +
-                    "suggestions to improve it. Resume data:\n\n" + JSON.stringify(resume),
-                },
-              ],
-            },
-          ],
-          generationConfig: {
-            responseMimeType: "application/json",
-            responseSchema: CHECK_SCHEMA,
-          },
-        }),
+    const groqRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${GROQ_API_KEY}`,
       },
-    );
+      body: JSON.stringify({
+        model: GROQ_MODEL,
+        response_format: { type: "json_object" },
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are an ATS (applicant tracking system) resume reviewer for a campus " +
+              "placement portal. Respond with ONLY a single valid JSON object, no markdown, " +
+              'no commentary, matching exactly this shape: {"score": <integer 0-100>, ' +
+              '"strengths": [<string>, ...], "suggestions": [<string>, ...]}. "score" is the ' +
+              "ATS compatibility score. \"strengths\" are genuine strengths found. " +
+              '"suggestions" are specific, actionable improvements.',
+          },
+          {
+            role: "user",
+            content: "Resume data as JSON:\n\n" + JSON.stringify(resume),
+          },
+        ],
+      }),
+    });
 
-    if (!geminiRes.ok) {
-      const errText = await geminiRes.text();
-      return jsonResponse({ error: `Gemini API error: ${errText}` }, 502);
+    if (!groqRes.ok) {
+      const errText = await groqRes.text();
+      return jsonResponse({ error: `Groq API error: ${errText}` }, 502);
     }
 
-    const geminiJson = await geminiRes.json();
-    const text: string | undefined = geminiJson.candidates?.[0]?.content?.parts?.[0]?.text;
+    const groqJson = await groqRes.json();
+    const text: string | undefined = groqJson.choices?.[0]?.message?.content;
     if (!text) {
-      return jsonResponse({ error: "Gemini did not return structured data" }, 502);
+      return jsonResponse({ error: "Groq did not return content" }, 502);
     }
 
     let result: { score: number; strengths: string[]; suggestions: string[] };
     try {
       result = JSON.parse(text);
     } catch {
-      return jsonResponse({ error: "Gemini returned invalid JSON" }, 502);
+      return jsonResponse({ error: "Groq returned invalid JSON" }, 502);
     }
 
     await supabase
