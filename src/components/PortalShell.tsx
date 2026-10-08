@@ -36,12 +36,15 @@ export function PortalShell({
   return (
     <div className="min-h-screen bg-slate-900 text-white flex">
       <div className="sm:hidden fixed top-0 inset-x-0 z-30 flex items-center justify-between px-4 py-3 bg-slate-800 border-b border-slate-700">
-        <div className="flex items-center gap-2">
+        <button
+          onClick={() => selectAndClose('overview')}
+          className="flex items-center gap-2 cursor-pointer"
+        >
           <div className="p-1.5 bg-blue-600/20 text-blue-400 rounded-lg">
             <Briefcase className="w-4 h-4" />
           </div>
           <p className="text-sm font-semibold">Placement Portal</p>
-        </div>
+        </button>
         <div className="flex items-center gap-1">
           <ThemeToggle />
           <button
@@ -69,7 +72,10 @@ export function PortalShell({
         )}
       >
         <div className="flex items-center justify-between gap-2 px-5 py-5 border-b border-slate-700">
-          <div className="flex items-center gap-2">
+          <button
+            onClick={() => selectAndClose('overview')}
+            className="flex items-center gap-2 cursor-pointer text-left"
+          >
             <div className="p-2 bg-blue-600/20 text-blue-400 rounded-lg">
               <Briefcase className="w-5 h-5" />
             </div>
@@ -77,7 +83,7 @@ export function PortalShell({
               <p className="text-sm font-semibold leading-tight">Placement Portal</p>
               <p className="text-xs text-slate-400 leading-tight">{roleLabel}</p>
             </div>
-          </div>
+          </button>
           <div className="flex items-center gap-1">
             <div className="hidden sm:block">
               <ThemeToggle />
