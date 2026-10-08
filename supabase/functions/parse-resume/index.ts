@@ -15,10 +15,21 @@ const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
 const GROQ_API_KEY = Deno.env.get("GROQ_API_KEY");
 const GROQ_MODEL = "openai/gpt-oss-120b";
 
+const BRANCH_OPTIONS = [
+  "Computer Science Engineering",
+  "Artificial Intelligence Engineering",
+  "Robotics and Automation Engineering",
+  "Civil Engineering",
+  "Mechanical Engineering",
+  "Electrical Engineering",
+  "Electronics Engineering",
+  "Chemical Engineering",
+] as const;
+
 const RESUME_SHAPE = `{
   "full_name": <string>,
   "phone": <string>,
-  "branch": <string, degree/branch of study e.g. Computer Science>,
+  "branch": <string, MUST be exactly one of: ${BRANCH_OPTIONS.map((b) => `"${b}"`).join(", ")} — pick the closest match, or omit this field if none are a reasonable match>,
   "batch_year": <integer, expected or actual graduation year>,
   "cgpa": <number>,
   "skills": [<string>, ...],
@@ -136,12 +147,16 @@ Deno.serve(async (req: Request) => {
       return jsonResponse({ error: "Groq returned invalid JSON" }, 502);
     }
 
+    const validBranch = BRANCH_OPTIONS.includes(parsed.branch as (typeof BRANCH_OPTIONS)[number])
+      ? parsed.branch
+      : null;
+
     const { data: updated, error: updateError } = await supabase
       .from("student_profiles")
       .update({
         resume_parsed: parsed,
         resume_status: "parsed",
-        branch: parsed.branch ?? null,
+        branch: validBranch,
         batch_year: parsed.batch_year ?? null,
         cgpa: parsed.cgpa ?? null,
         phone: parsed.phone ?? null,
