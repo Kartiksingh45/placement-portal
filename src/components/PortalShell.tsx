@@ -133,7 +133,15 @@ export function PortalShell({
         </div>
       </aside>
 
-      <main className="flex-1 p-4 pt-20 sm:p-8 overflow-y-auto overflow-x-hidden">{children}</main>
+      <main className="flex-1 p-4 pt-20 sm:p-8 overflow-y-auto overflow-x-hidden">
+        <div className="flex items-center gap-3 pb-6 mb-6 border-b border-slate-800">
+          <div className="p-2 bg-blue-600/20 text-blue-400 rounded-lg shrink-0">
+            <Briefcase className="w-5 h-5" />
+          </div>
+          <span className="text-lg font-bold tracking-tight">Campus Placement Portal</span>
+        </div>
+        {children}
+      </main>
     </div>
   )
 }
